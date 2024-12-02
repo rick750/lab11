@@ -41,21 +41,28 @@ public final class ConcurrentGUI extends JFrame {
         final ExecutorService executor = Executors.newSingleThreadExecutor();
         final Agent agent = new Agent();
         executor.submit(agent);
-        stop.addActionListener((e) -> agent.stopCounting());
+        up.addActionListener(e -> agent.countUp());
+        down.addActionListener(e -> agent.countDown());
+        stop.addActionListener(e -> {
+            agent.stopCounting();
+            stop.setEnabled(false);
+            up.setEnabled(false);
+            down.setEnabled(false);
+        });
         executor.shutdown();
     }
         
     private class Agent implements Runnable {
-        private boolean stop;
+        private volatile boolean stop;
         private int counter;
 
         @Override
         public void run() {
             while (!this.stop) {
                 try {
-                    // The EDT doesn't access `counter` anymore, it doesn't need to be volatile 
                     final var nextText = Integer.toString(this.counter);
                     SwingUtilities.invokeAndWait(() -> ConcurrentGUI.this.display.setText(nextText));
+                    if
                     this.counter++;
                     Thread.sleep(100);
                 } catch (InvocationTargetException | InterruptedException ex) {

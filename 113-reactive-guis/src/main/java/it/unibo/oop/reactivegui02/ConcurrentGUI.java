@@ -41,8 +41,8 @@ public final class ConcurrentGUI extends JFrame {
         final ExecutorService executor = Executors.newSingleThreadExecutor();
         final Agent agent = new Agent();
         executor.submit(agent);
-        up.addActionListener(e -> agent.countUp());
-        down.addActionListener(e -> agent.countDown());
+        up.addActionListener(e -> agent.increase());
+        down.addActionListener(e -> agent.decrease());
         stop.addActionListener(e -> {
             agent.stopCounting();
             stop.setEnabled(false);
@@ -54,6 +54,7 @@ public final class ConcurrentGUI extends JFrame {
         
     private class Agent implements Runnable {
         private volatile boolean stop;
+        private volatile boolean up = true;
         private int counter;
 
         @Override
@@ -62,8 +63,7 @@ public final class ConcurrentGUI extends JFrame {
                 try {
                     final var nextText = Integer.toString(this.counter);
                     SwingUtilities.invokeAndWait(() -> ConcurrentGUI.this.display.setText(nextText));
-                    if
-                    this.counter++;
+                    this.counter += up ? 1 : -1;
                     Thread.sleep(100);
                 } catch (InvocationTargetException | InterruptedException ex) {
                     /*
@@ -75,8 +75,16 @@ public final class ConcurrentGUI extends JFrame {
             }
         }
         
+        public void increase() {
+            this.up = true;
+        }
+        
+        public void decrease() {
+            this.up = false;
+        }
+
         public void stopCounting() {
             this.stop = true;
-        }
+        }        
     }
 }

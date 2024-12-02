@@ -1,6 +1,5 @@
 package it.unibo.oop.reactivegui01;
 
-
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.lang.reflect.InvocationTargetException;

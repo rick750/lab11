@@ -3,8 +3,6 @@ package it.unibo.oop.reactivegui02;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -25,6 +23,9 @@ public final class ConcurrentGUI extends JFrame {
     private final JButton down = new JButton("down");
     private final JButton stop = new JButton("stop");
 
+    /**
+     * Basic implementation of a ConcurrentGUI.
+     */
     public ConcurrentGUI() {
         super();
         final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -38,9 +39,7 @@ public final class ConcurrentGUI extends JFrame {
         this.getContentPane().add(panel);
         this.setVisible(true);
 
-        final ExecutorService executor = Executors.newSingleThreadExecutor();
         final Agent agent = new Agent();
-        executor.submit(agent);
         up.addActionListener(e -> agent.increase());
         down.addActionListener(e -> agent.decrease());
         stop.addActionListener(e -> {
@@ -49,10 +48,10 @@ public final class ConcurrentGUI extends JFrame {
             up.setEnabled(false);
             down.setEnabled(false);
         });
-        executor.shutdown();
+        new Thread(agent).start();
     }
-        
-    private class Agent implements Runnable {
+
+    final class Agent implements Runnable {
         private volatile boolean stop;
         private volatile boolean up = true;
         private int counter;
@@ -78,13 +77,13 @@ public final class ConcurrentGUI extends JFrame {
         public void increase() {
             this.up = true;
         }
-        
+
         public void decrease() {
             this.up = false;
         }
 
         public void stopCounting() {
             this.stop = true;
-        }        
+        }
     }
 }

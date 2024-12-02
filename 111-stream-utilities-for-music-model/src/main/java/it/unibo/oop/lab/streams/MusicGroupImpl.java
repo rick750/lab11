@@ -1,6 +1,5 @@
 package it.unibo.oop.lab.streams;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -8,7 +7,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -49,12 +47,12 @@ public final class MusicGroupImpl implements MusicGroup {
     public Stream<String> albumInYear(final int year) {
         return this.albums.entrySet().stream()
             .filter(t -> t.getValue() == year)
-            .map(t -> t.getKey());
+            .map(Entry::getKey);
     }
 
     @Override
     public int countSongs(final String albumName) {
-        return (int)this.songs.stream()
+        return (int) this.songs.stream()
             .filter(t -> t.getAlbumName().isPresent())
             .filter(t -> t.getAlbumName().get().equals(albumName))
             .count();
@@ -62,7 +60,7 @@ public final class MusicGroupImpl implements MusicGroup {
 
     @Override
     public int countSongsInNoAlbum() {
-        return (int)this.songs.stream()
+        return (int) this.songs.stream()
             .filter(t -> t.getAlbumName().isEmpty())
             .count();
     }
@@ -70,6 +68,8 @@ public final class MusicGroupImpl implements MusicGroup {
     @Override
     public OptionalDouble averageDurationOfSongs(final String albumName) {
         return this.songs.stream()
+            .filter(t -> t.getAlbumName().isPresent())
+            .filter(t -> t.getAlbumName().get().equals(albumName))
             .mapToDouble(Song::getDuration)
             .average();
     }
